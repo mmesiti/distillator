@@ -1,0 +1,8 @@
+__pycache__/
+include_backup/
+used_macros.txt
+used_macros_by_grouprep/
+used_macros_by_grouprep_repr_func/
+used_macros_by_name/
+used_macros_by_name_repr_func/
+used_macros_repr_func.txt

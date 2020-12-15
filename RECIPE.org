@@ -1,0 +1,15 @@
+#+TITLE: Recipe
+
+Recipe to extract Sombrero from HiRep
+
+* clone HiRep
+* build the 6 libraries with the perl/c++ code generator
+
+* clone Sombrero without LibHR
+* copy sombrero/sombrero directory in HiRep
+* make callgraph with sombrero and LibHR, find the useful sources
+!! FIND DEFINITIONS?
+* copy the useful sources and headers in the sombrero repository 
+* Add the libhr stubs needed by the performance estimations
+* package everything and publish it somewhere accessible
+
