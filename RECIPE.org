@@ -4,12 +4,23 @@ Recipe to extract Sombrero from HiRep
 
 * clone HiRep
 * build the 6 libraries with the perl/c++ code generator
-
+Done automatically with Make from HiRep's makefile
 * clone Sombrero without LibHR
-* copy sombrero/sombrero directory in HiRep
+* copy some stuff from sombrero into Hirep
+- sombrero/sombrero directory
+- Include/suN.h
+- Include/suN_repr_func.h
+- Include/suN_types.h
+* clone pycparser
 * make callgraph with sombrero and LibHR, find the useful sources
-!! FIND DEFINITIONS?
-* copy the useful sources and headers in the sombrero repository 
+* copy the useful sources in the sombrero repository
+filtering out the unused functions
+* copy the makefiles in the sombrero repository
+not overwriting the ones that are already there 
+* copy the useful headers in the sombrero repository
+* copy other manually listed files that for some reason were not detected
+(try to reduce this to a minumum)
 * Add the libhr stubs needed by the performance estimations
+* removed unused functions from header files (à la grep -v) (optional)
 * package everything and publish it somewhere accessible
 
