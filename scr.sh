@@ -145,6 +145,15 @@ copy_additional_files(){
 
 copy_additional_files 
 
+# 8
+clean macros(){
+    $MACROMODULE/replace_macros.sh $SOMBRERO
+}
+clean_macros
 
 #######
-cd sombrero && make sombrero/sombrero5
+cd sombrero
+for i in {1..6}
+do
+    make sombrero/sombrero$i && mpirun -n 16 --oversubscribe ./sombrero/sombrero$i -l 8x8x8x8 -p 2x2x2x2
+done 

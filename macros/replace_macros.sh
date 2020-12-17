@@ -6,7 +6,8 @@ INCLUDE=$ROOTDIR/Include
 # From https://stackoverflow.com/a/246128/3113564
 SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-TMPDIR=${SCRIPT_LOCATION}/
+TMPDIR=${SCRIPT_LOCATION}/TMP
+mkdir -p $TMPDIR
 python ${SCRIPT_LOCATION}/main.py $ROOTDIR $TMPDIR
 
 INCLUDE_BACKUP=${SCRIPT_LOCATION}/include_backup

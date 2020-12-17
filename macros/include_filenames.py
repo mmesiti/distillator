@@ -3,8 +3,7 @@ from os import path
 def get_files_matching_template(directory,template,cases):
     return [path.join(directory,template.format(case = c)) for c in cases]
 
-# NOTE: SU3AS is named incorrectly, should be SU3S, but su3as is the name currently used.
-groupreps = ["sp4","sp4adj","su2","su2adj","su3","su3as"]
+groupreps = ["sp4","sp4adj","su2","su2adj","su3","su3sym"]
 
 def get_suN_like_files(directory):
     return get_files_matching_template(directory,
