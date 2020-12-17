@@ -14,8 +14,6 @@ def is_filename_relevant(filename):
                 and "flt" not in filename and "integrator" not in filename
                 and "force" not in filename and "update.c" not in filename
                 ))
-
-    print(filename,"relevant:",res)
     return res
 
 

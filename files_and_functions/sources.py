@@ -31,7 +31,6 @@ def line_start_unused_function_definition(i,line, unused_functions):
     for funcname in unused_functions:
         match = re.search(r"(^|\W)" + funcname + "(\W|$)", line)
         if match:
-            print(" "*10,i,line,funcname) # DEBUG
             return True
 
     return False

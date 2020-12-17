@@ -45,8 +45,7 @@ def get_included_headers_recursive(filename, includepaths):
 
 
 def get_all_included_headers_recursive(filenames, includepaths):
-    headers = set.union(
-        *[get_included_headers_recursive(f, includepaths) for f in filenames])
+    headers = set.union(*[get_included_headers_recursive(f, includepaths) for f in filenames])
 
     return [
         fp for header in headers

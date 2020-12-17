@@ -64,7 +64,9 @@ clone_sombrero(){
 
     cp -r $SOMBRERO/sombrero $HIREP
     cp $SOMBRERO/Include/suN.h $HIREP/Include
+    cp $SOMBRERO/Include/sombrero.h $HIREP/Include
     cp $SOMBRERO/Include/suN_repr_func.h $HIREP/Include
+    cp $SOMBRERO/Include/libhr_defines_interface.h $HIREP/Include
     cp $SOMBRERO/Include/suN_types.h $HIREP/Include
 
     # Processing LibHR files

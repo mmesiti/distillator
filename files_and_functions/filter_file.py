@@ -13,7 +13,6 @@ if __name__ == "__main__":
 
     unused_functions.remove('main')
 
-    print(_input) # DEBUG
     with open(_input ,'r') as f:
         lines = f.readlines()
 
