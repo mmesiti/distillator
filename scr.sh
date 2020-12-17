@@ -146,7 +146,7 @@ copy_additional_files(){
 copy_additional_files 
 
 # 8
-clean macros(){
+clean_macros(){
     $MACROMODULE/replace_macros.sh $SOMBRERO
 }
 clean_macros
