@@ -2,17 +2,20 @@
 import re
 from multiline_comments import next_comment_state
 
+
 def is_preprocessor_line(line):
-    directives = [
-        "#if", "#ifdef", "#ifndef", "#else", "#endif", "#define", "#include"
+    directive_patterns = [
+        r"#\s*if", r"#\s*ifdef", r"#\s*ifndef", r"#\s*else", r"#\s*endif",
+        r"#\s*define", r"#\s*include"
     ]
-    return any(d in line for d in directives)
+    return any(re.search(dp, line) for dp in directive_patterns)
 
 
 def level_after_line(level, line):
     return level + line.count('{') - line.count('}')
 
-def line_start_unused_function_definition(i,line, unused_functions):
+
+def line_start_unused_function_definition(i, line, unused_functions):
     line = line[:line.find('//')] if '//' in line else line
     for funcname in unused_functions:
         match = re.search(r"(^|\W)" + funcname + "(\W|$)", line)
@@ -21,11 +24,12 @@ def line_start_unused_function_definition(i,line, unused_functions):
 
     return False
 
+
 def remove_unused_functions_from_lines(unused_functions,
                                        lines,
-                                        represent_line=lambda i, line: line,
-                                        *args,
-                                        **kwargs):
+                                       represent_line=lambda i, line: line,
+                                       *args,
+                                       **kwargs):
     new_lines = []
     include_line = True
     level = 0
@@ -47,7 +51,7 @@ def remove_unused_functions_from_lines(unused_functions,
         elif level == 0:
             if (not in_multiline_comment
                     and line_start_unused_function_definition(
-                        i,line, unused_functions)):
+                        i, line, unused_functions)):
                 include_line = False
                 in_unused_function_header = True
             elif not in_unused_function_header:
@@ -68,8 +72,7 @@ def remove_unused_functions_from_lines(unused_functions,
 
 def remove_print_compiling_info(lines):
     def _filter(line):
-        return not (re.search("(\W|^)print_compiling_info(\W|$)",line)
-                    or
-                    re.search("(\W|^)print_compiling_info_short(\W|$)",line))
+        return not (re.search("(\W|^)print_compiling_info(\W|$)", line) or
+                    re.search("(\W|^)print_compiling_info_short(\W|$)", line))
 
-    return [ line for line in lines if _filter(line)]
+    return [line for line in lines if _filter(line)]
