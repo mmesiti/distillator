@@ -18,7 +18,6 @@ clone_hirep(){
     HIREP_REMOTE=git@github.com:sa2c/HiRep
     git clone --depth=1 ${HIREP_REMOTE} ${HIREP} 
 }
-clone_hirep
 # 2
 generate_headers(){
     echo "Preparing MkFlags"
@@ -55,13 +54,14 @@ generate_headers(){
     write_headers 4 REPR_ADJOINT     GAUGE_SPN sp4adj
 
 }
-generate_headers
 # 3
 clone_sombrero(){
     #SOMBRERO_REMOTE=git@github.com:mmesiti/sombrero
     SOMBRERO_REMOTE=/home/michele/hirep-workspace/gantry_sombrero/sombrero
     git clone --depth=1 ${SOMBRERO_REMOTE} --branch test $SOMBRERO  
-
+}
+# 4
+copy_sombrero_files(){
     cp -r $SOMBRERO/sombrero $HIREP
     cp $SOMBRERO/Include/suN.h $HIREP/Include
     cp $SOMBRERO/Include/sombrero.h $HIREP/Include
@@ -78,33 +78,27 @@ clone_sombrero(){
     done 
 
 }
-clone_sombrero
-# 4
+# 5
 clone_pycparser(){
     PYCPARSER_REMOTE=git@github.com:eliben/pycparser.git
     git clone --depth=1 ${PYCPARSER_REMOTE} $PYCPARSER
 }
-clone_pycparser
-# 5
+# 6
 analyse_callgraph(){
-python3 $FFMODULE/main.py $FFMODULE/cpp_flags.yaml $HIREP $PYCPARSER
+    python3 $FFMODULE/main.py $FFMODULE/cpp_flags.yaml $HIREP $PYCPARSER
 }
-
-analyse_callgraph
-
-#  6 
-copy_selected_sources(){
+# 7 
+copy_and_clean_selected_sources(){
     # TODO: maybe use a flat directory instead?    
     for FILE in $(cat all_used_sources.txt)
     do
         NEWFILE=$(sed 's|'$HIREP'|'$SOMBRERO'|' <<< "$FILE")
         mkdir -p $(dirname $NEWFILE)
-        python3 $FFMODULE/filter_file.py $FILE $NEWFILE all_unused_functions.txt
+        python3 $FFMODULE/filter_source.py $FILE $NEWFILE all_unused_functions.txt
     done
 
 }
-copy_selected_sources 
-# 7
+# 8
 copy_makefiles(){
     # Since we're not using a flat directory,
     # we need to also copy the makefiles
@@ -122,18 +116,17 @@ copy_makefiles(){
         fi
     done
 }
-copy_makefiles
-
-# 6
+# 9
 copy_selected_headers(){
     for FILE in $(cat used_headers.txt)
     do
-        cp $FILE $SOMBRERO/Include 
+        echo $FILE
+        NEWFILE=$SOMBRERO/Include/$(basename $FILE)
+        python3 $FFMODULE/filter_header.py $FILE $NEWFILE all_unused_functions.txt
+
     done 
 }
-copy_selected_headers 
-
-# 7
+#10 
 copy_additional_files(){
     for FILE in $(cat $SCRIPT_LOCATION/additional_files_to_copy.txt)
     do
@@ -142,18 +135,9 @@ copy_additional_files(){
         cp $FILE $NEWFILE
     done
 }
-
-copy_additional_files 
-
-# 8
+#11
 clean_macros(){
     $MACROMODULE/replace_macros.sh $SOMBRERO
 }
-clean_macros
 
-#######
-cd sombrero
-for i in {1..6}
-do
-    make sombrero/sombrero$i && mpirun -n 16 --oversubscribe ./sombrero/sombrero$i -l 8x8x8x8 -p 2x2x2x2
-done 
+

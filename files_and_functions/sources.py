@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import re
-
+from multiline_comments import next_comment_state
 
 def is_preprocessor_line(line):
     directives = [
@@ -12,22 +12,8 @@ def is_preprocessor_line(line):
 def level_after_line(level, line):
     return level + line.count('{') - line.count('}')
 
-
-def _starts_comment(line):
-    return "/*" in line and "*/" not in line[line.find("/*"):]
-
-
-def _ends_comment(line):
-    return "*/" in line and "/*" not in line[line.find("*/"):]
-
-
-def next_comment_state(line, already_in_comment):
-    res = ((not already_in_comment and _starts_comment(line))
-           or already_in_comment and not _ends_comment(line))
-    return res
-
-
 def line_start_unused_function_definition(i,line, unused_functions):
+    line = line[:line.find('//')] if '//' in line else line
     for funcname in unused_functions:
         match = re.search(r"(^|\W)" + funcname + "(\W|$)", line)
         if match:
@@ -35,13 +21,11 @@ def line_start_unused_function_definition(i,line, unused_functions):
 
     return False
 
-
 def remove_unused_functions_from_lines(unused_functions,
                                        lines,
                                         represent_line=lambda i, line: line,
                                         *args,
                                         **kwargs):
-
     new_lines = []
     include_line = True
     level = 0
@@ -55,7 +39,8 @@ def remove_unused_functions_from_lines(unused_functions,
             if include_line:
                 new_lines.append(represent_line(i, line, *args, **kwargs))
             else:
-                new_lines.append(f'//{i}\n')
+                pass
+                # new_lines.append(f'//{i}\n')
             level = level_after_line(level, line)
             if level == 0:
                 include_line = True
@@ -72,7 +57,8 @@ def remove_unused_functions_from_lines(unused_functions,
             if include_line:
                 new_lines.append(represent_line(i, line, *args, **kwargs))
             else:
-                new_lines.append(f'//{i}\n')
+                pass
+                # new_lines.append(f'//{i}\n')
             level = level_after_line(level, line)
             if level > 0:
                 in_unused_function_header = False
