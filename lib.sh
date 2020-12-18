@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+
+# Local directories
 HIREP=HiRep
 SOMBRERO=sombrero
 PYCPARSER=pycparser
 
 # From https://stackoverflow.com/a/246128/3113564
 SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+source $SCRIPT_LOCATION/remotes.sh
 
 FFMODULE=$SCRIPT_LOCATION/files_and_functions
 MACROMODULE=$SCRIPT_LOCATION/macros
@@ -15,13 +19,12 @@ export PYTHONPATH=$FFMODULE:$MACROMODULE
 
 # 1
 clone_hirep(){
-    HIREP_REMOTE=git@github.com:sa2c/HiRep
-    git clone --depth=1 ${HIREP_REMOTE} ${HIREP} 
+    git clone --depth=1 ${HIREP_REMOTE} --branch ${HIREP_REMOTE_BRANCH} ${HIREP} 
 }
 # 2
 generate_headers(){
     echo "Preparing MkFlags"
-    MKFLAGS=${HIREP}/Make/MkFlags
+    local MKFLAGS=${HIREP}/Make/MkFlags
     cp $MKFLAGS $MKFLAGS.bu 
     grep -v "NG\|REPR\|GAUGE_GROUP" $MKFLAGS.bu > $MKFLAGS 
 
@@ -56,9 +59,7 @@ generate_headers(){
 }
 # 3
 clone_sombrero(){
-    #SOMBRERO_REMOTE=git@github.com:mmesiti/sombrero
-    SOMBRERO_REMOTE=/home/michele/hirep-workspace/gantry_sombrero/sombrero
-    git clone --depth=1 ${SOMBRERO_REMOTE} --branch test $SOMBRERO  
+    git clone --depth=1 ${SOMBRERO_REMOTE} --branch ${SOMBRERO_REMOTE_BRANCH} ${SOMBRERO}
 }
 # 4
 copy_sombrero_files(){
@@ -80,7 +81,6 @@ copy_sombrero_files(){
 }
 # 5
 clone_pycparser(){
-    PYCPARSER_REMOTE=git@github.com:eliben/pycparser.git
     git clone --depth=1 ${PYCPARSER_REMOTE} $PYCPARSER
 }
 # 6
