@@ -6,7 +6,7 @@ It is a set of scripts written in bash and python.
 
 * Setup
 To parse the C code (after preprocessing), [[https://github.com/eliben/pycparser][pycparser]] is used.
-Pipenv is used to manage the environment, see [[file:Pipfile][Pipfile]](TODO).
+Pipenv is used to manage the environment, see [[file:Pipfile][Pipfile]].
 
 * Steps
 These steps are done by [[file:shoplifter.sh][shoplifter.sh]].
