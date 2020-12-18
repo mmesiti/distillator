@@ -2,27 +2,26 @@
 
 Steals a Sombrero from HiRep's shop.
 
-* clone HiRep
-* build the 6 libraries with the perl/c++ code generator
-Done automatically with Make from HiRep's makefile
-* clone Sombrero without most of LibHR
-* copy some stuff from sombrero into Hirep
-- sombrero/sombrero directory
-- Include/suN.h
-- Include/sombrero.h
-- Include/suN_repr_func.h
-- Include/libhr_defines_interface.h
-- Include/suN_types.h
-* clone pycparser
-* analyse callgraph with sombrero and LibHR, find the useful sources
-* copy and clean the useful sources to the sombrero repository
-filtering out the unused functions
-* copy the makefiles to the sombrero repository
-not overwriting the ones that are already there 
-* copy and clean the useful headers to the sombrero repository
-* copy other manually listed files that for some reason were not detected
-(try to reduce this to a minumum)
-* clean the macros in sombrero, in place
-* compile and run the benchmarks for test
-* package everything and publish it somewhere accessible
+
+1. clone HiRep
+2. build the 6 libraries with the perl/c++ code generator one automatically with Make from HiRep's makefile
+3. clone Sombrero without most of LibHR
+4. copy some stuff from sombrero into Hirep
+   - sombrero/sombrero directory
+   - Include/suN.h
+   - Include/sombrero.h
+   - Include/suN_repr_func.h
+   - Include/libhr_defines_interface.h
+   - Include/suN_types.h
+5. clone pycparser
+6. analyse callgraph with sombrero and LibHR, find the useful sources
+7. copy and clean the useful sources to the sombrero repository filtering out the unused functions
+8. copy the makefiles to the sombrero repository not overwriting the ones that are already there 
+9. copy and clean the useful headers to the sombrero repository
+10. copy other manually listed files that for some reason were not detected (try to reduce this to a minumum)
+11. clean the macros in sombrero, in place
+
+
+12. compile and run the benchmarks for test
+13. package everything and publish it somewhere accessible
 
