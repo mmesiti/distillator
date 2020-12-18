@@ -2,6 +2,7 @@
 
 Steals a Sombrero from HiRep's shop.
 
+* Steps
 
 1. clone HiRep
 2. build the 6 libraries with the perl/c++ code generator one automatically with Make from HiRep's makefile
@@ -21,6 +22,7 @@ Steals a Sombrero from HiRep's shop.
 10. copy other manually listed files that for some reason were not detected (try to reduce this to a minumum)
 11. clean the macros in sombrero, in place
 
+* Additionally
 
 12. compile and run the benchmarks for test
 13. package everything and publish it somewhere accessible
