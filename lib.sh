@@ -19,10 +19,12 @@ export PYTHONPATH=$FFMODULE:$MACROMODULE
 
 # 1
 clone_hirep(){
+    local HIREP=$1
     git clone --depth=1 ${HIREP_REMOTE} --branch ${HIREP_REMOTE_BRANCH} ${HIREP} 
 }
 # 2
 generate_headers(){
+    local HIREP=$1
     echo "Preparing MkFlags"
     local MKFLAGS=${HIREP}/Make/MkFlags
     cp $MKFLAGS $MKFLAGS.bu 
@@ -59,10 +61,14 @@ generate_headers(){
 }
 # 3
 clone_sombrero(){
+    SOMBRERO=$1
     git clone --depth=1 ${SOMBRERO_REMOTE} --branch ${SOMBRERO_REMOTE_BRANCH} ${SOMBRERO}
 }
 # 4
 copy_sombrero_files(){
+    local HIREP=$1
+    local SOMBRERO=$2
+
     cp -r $SOMBRERO/sombrero $HIREP
     cp $SOMBRERO/Include/suN.h $HIREP/Include
     cp $SOMBRERO/Include/sombrero.h $HIREP/Include
@@ -81,15 +87,20 @@ copy_sombrero_files(){
 }
 # 5
 clone_pycparser(){
+    local PYCPARSER=$1
     git clone --depth=1 ${PYCPARSER_REMOTE} $PYCPARSER
 }
 # 6
 analyse_callgraph(){
+    local HIREP=$1
+    local PYCPARSER=$2
     python3 $FFMODULE/main.py $FFMODULE/cpp_flags.yaml $HIREP $PYCPARSER
 }
 # 7 
 copy_and_clean_selected_sources(){
     # TODO: maybe use a flat directory instead?    
+    local HIREP=$1
+    local SOMBRERO=$2
     for FILE in $(cat all_used_sources.txt)
     do
         NEWFILE=$(sed 's|'$HIREP'|'$SOMBRERO'|' <<< "$FILE")
@@ -103,6 +114,9 @@ copy_makefiles(){
     # Since we're not using a flat directory,
     # we need to also copy the makefiles
     # only those which do not exist!
+    local HIREP=$1
+    local SOMBRERO=$2
+   
     for FILE in $(find $HIREP/LibHR -name Makefile)
     do
         NEWFILE=$(sed 's|'$HIREP'|'$SOMBRERO'|' <<< "$FILE")
@@ -118,17 +132,22 @@ copy_makefiles(){
 }
 # 9
 copy_selected_headers(){
-    for FILE in $(cat used_headers.txt)
+    local FILELIST=$1
+    local SOMBRERO=$2
+    local UNUSED_FUNCTIONS=$3
+    for FILE in $(cat $FILELIST)
     do
         echo $FILE
         NEWFILE=$SOMBRERO/Include/$(basename $FILE)
-        python3 $FFMODULE/filter_header.py $FILE $NEWFILE all_unused_functions.txt
-
+        python3 $FFMODULE/filter_header.py $FILE $NEWFILE $UNUSED_FUNCTIONS
     done 
 }
 #10 
 copy_additional_files(){
-    for FILE in $(cat $SCRIPT_LOCATION/additional_files_to_copy.txt)
+    local FILELIST=$1
+    local HIREP=$2
+    local SOMBRERO=$3
+    for FILE in $(cat $FILELIST)
     do
         NEWFILE=$(sed 's|'$HIREP'|'$SOMBRERO'|' <<< "$FILE")
         mkdir -p $(dirname $NEWFILE)
@@ -137,7 +156,12 @@ copy_additional_files(){
 }
 #11
 clean_macros(){
+   local SOMBRERO=$1
     $MACROMODULE/replace_macros.sh $SOMBRERO
 }
 
-
+#12
+package(){
+   local SOMBRERO=$1
+   find $SOMBRERO -type f | grep -v '.git' | xargs tar -cvf sombrero.tar.gz
+}

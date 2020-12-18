@@ -1,16 +1,20 @@
 #+TITLE: Shoplifter
 
 Steals a Sombrero from HiRep.
+It is a set of scripts written in Bash and Python.
 
-It is a set of scripts written in bash and python.
-
-* Setup
+* Setup and configuration
 To parse the C code (after preprocessing), [[https://github.com/eliben/pycparser][pycparser]] is used.
 Pipenv is used to manage the environment, see [[file:Pipfile][Pipfile]].
 
+To be sure that the right versions
+of HiRep and Sombrero
+are used, please check [[file:remotes.sh][remotes.sh]].
+
 * Steps
 These steps are done by [[file:shoplifter.sh][shoplifter.sh]].
-Due to changes in HiRep, some of these steps might fail.
+If there are changes in HiRep,
+some of these steps might fail.
 
 1. Clone HiRep;
 2. Build the 6 libraries with the perl/c++ code generator
@@ -34,6 +38,9 @@ Due to changes in HiRep, some of these steps might fail.
 9. Copy and clean the useful headers to the "thin Sombrero" repository;
 10. Copy to the "thin Sombrero" repository other manually listed files that for some reason were not detected;
 11. Clean the macros in the "thin Sombrero" repository (which is not that thin anymore), in place.
+12. Package sombrero in a ~tar.gz~ file.
+
+Note: all the steps are defined in [[file:lib.sh][lib.sh]].
 
 * Tests and verification
 This is done by [[file:test.sh][test.sh]].
