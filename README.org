@@ -11,6 +11,11 @@ To be sure that the right versions
 of HiRep and Sombrero
 are used, please check [[file:remotes.sh][remotes.sh]].
 
+For the lazy,
+a Docker image can be used:
+[[https://hub.docker.com/repository/docker/michelemesiti/shoplifter][michelemesiti/shoplifter:latest]].
+See instruction on that page for usage.
+
 * Steps
 These steps are done by [[file:shoplifter.sh][shoplifter.sh]].
 If there are changes in HiRep,
