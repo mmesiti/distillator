@@ -27,3 +27,5 @@ copy_additional_files $SCRIPT_LOCATION/additional_files_to_copy.txt $HIREP $SOMB
 clean_macros $SOMBRERO
 #12
 package $SOMBRERO
+
+echo "Finished."
