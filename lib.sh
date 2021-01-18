@@ -17,18 +17,22 @@ MACROMODULE=$SCRIPT_LOCATION/macros
 
 export PYTHONPATH=$FFMODULE:$MACROMODULE
 
+
+BOLD="\e[1;32m"
+NORMAL="\e[0m"
+
 # 1
 clone_hirep(){
     local HIREP=$1
-    echo "Cloning HiRep from $HIREP_REMOTE to $HIREP, on branch ${HIREP_REMOTE_BRANCH}"
+    echo -e "${BOLD}Cloning HiRep from $HIREP_REMOTE to $HIREP, on branch ${HIREP_REMOTE_BRANCH}${NORMAL}"
     git clone --depth=1 ${HIREP_REMOTE} --branch ${HIREP_REMOTE_BRANCH} ${HIREP} 
 }
 # 2
 generate_headers(){
     local HIREP=$1
-    echo "Preparing MkFlags"
+    echo -e "${BOLD}Preparing MkFlags${NORMAL}"
     local MKFLAGS=${HIREP}/Make/MkFlags
-    echo "Back up of MkFlags"
+    echo -e "${BOLD}Back up of MkFlags${NORMAL}"
     cp $MKFLAGS $MKFLAGS.bu 
     grep -v "NG\|REPR\|GAUGE_GROUP" $MKFLAGS.bu > $MKFLAGS 
 
@@ -37,16 +41,16 @@ generate_headers(){
         local REPR=$2
         local GROUP=$3
         local NAME=$4
-        echo "Writing headers for NG=$NG, REPR=$REPR, GROUP=$GROUP,  NAME=$NAME"
+        echo -e "${BOLD}Writing headers for NG=$NG, REPR=$REPR, GROUP=$GROUP,  NAME=$NAME${NORMAL}"
         touch $MKFLAGS # To trigger ricompilation of write_repr
         (
             cd $HIREP/Include
             make NG=$NG REPR=$REPR GAUGE_GROUP=$GROUP
-            echo mv suN.h $NAME.h 
+            echo -e mv suN.h $NAME.h 
             mv suN.h $NAME.h 
-            echo mv suN_types.h ${NAME}_types.h
+            echo -e mv suN_types.h ${NAME}_types.h
             mv suN_types.h ${NAME}_types.h
-            echo mv suN_repr_func.h ${NAME}_repr_func.h
+            echo -e mv suN_repr_func.h ${NAME}_repr_func.h
             mv suN_repr_func.h ${NAME}_repr_func.h
         ) 
 
@@ -63,15 +67,15 @@ generate_headers(){
 # 3
 clone_sombrero(){
     SOMBRERO=$1
-    echo "Cloning Sombrero from ${SOMBRERO_REMOTE} to ${SOMBRERO}"
-    echo "(branch: ${SOMBRERO_REMOTE_BRANCH})"
+    echo -e "${BOLD}Cloning Sombrero from ${SOMBRERO_REMOTE} to ${SOMBRERO}${NORMAL}"
+    echo -e "${BOLD}(branch: ${SOMBRERO_REMOTE_BRANCH})${NORMAL}"
     git clone --depth=1 ${SOMBRERO_REMOTE} --branch ${SOMBRERO_REMOTE_BRANCH} ${SOMBRERO}
 }
 # 4
 copy_sombrero_files(){
     local HIREP=$1
     local SOMBRERO=$2
-    echo "Copying files from $SOMBRERO to $HIREP"
+    echo -e "${BOLD}Copying files from $SOMBRERO to $HIREP${NORMAL}"
 
     (
         set -o xtrace
@@ -99,14 +103,14 @@ copy_sombrero_files(){
 # 5
 clone_pycparser(){
     local PYCPARSER=$1
-    echo "Cloning $PYCPARSER"
+    echo -e "${BOLD}Cloning $PYCPARSER${NORMAL}"
     git clone --depth=1 ${PYCPARSER_REMOTE} $PYCPARSER
 }
 # 6
 analyse_callgraph(){
     local HIREP=$1
     local PYCPARSER=$2
-    echo "Analysing Callgraph in $HIREP"
+    echo -e "${BOLD}Analysing Callgraph in $HIREP${NORMAL}"
     python3 $FFMODULE/main.py $FFMODULE/cpp_flags.yaml $HIREP $PYCPARSER
 }
 # 7 
@@ -114,7 +118,7 @@ copy_and_clean_selected_sources(){
     # TODO: maybe use a flat directory instead?    
     local HIREP=$1
     local SOMBRERO=$2
-    echo "Copying and cleaning selected sources from $HIREP to $SOMBRERO"
+    echo -e "${BOLD}Copying and cleaning selected sources from $HIREP to $SOMBRERO${NORMAL}"
     for FILE in $(cat all_used_sources.txt)
     do
         NEWFILE=$(sed 's|'$HIREP'|'$SOMBRERO'|' <<< "$FILE")
@@ -131,7 +135,7 @@ copy_makefiles(){
     local HIREP=$1
     local SOMBRERO=$2
     
-    echo "Copying necessary Makefiles from $HIREP to $SOMBRERO"
+    echo -e "${BOLD}Copying necessary Makefiles from $HIREP to $SOMBRERO${NORMAL}"
     for FILE in $(find $HIREP/LibHR -name Makefile)
     do
         NEWFILE=$(sed 's|'$HIREP'|'$SOMBRERO'|' <<< "$FILE")
@@ -141,7 +145,7 @@ copy_makefiles(){
             then
                 (
                     set -o xtrace
-                    echo $(dirname $NEWFILE)
+                    echo -e $(dirname $NEWFILE)
                     cp $FILE $NEWFILE
                 )
             fi
@@ -153,10 +157,10 @@ copy_selected_headers(){
     local FILELIST=$1
     local SOMBRERO=$2
     local UNUSED_FUNCTIONS=$3
-    echo "Copying necessary Makefiles from $HIREP to $SOMBRERO"
+    echo -e "${BOLD}Copying necessary Makefiles from $HIREP to $SOMBRERO${NORMAL}"
     for FILE in $(cat $FILELIST)
     do
-        echo $FILE
+        echo -e $FILE
         NEWFILE=$SOMBRERO/Include/$(basename $FILE)
         python3 $FFMODULE/filter_header.py $FILE $NEWFILE $UNUSED_FUNCTIONS
     done 
@@ -166,7 +170,7 @@ copy_additional_files(){
     local FILELIST=$1
     local HIREP=$2
     local SOMBRERO=$3
-    echo "Copying additional flies from $HIREP to $SOMBRERO"
+    echo -e "${BOLD}Copying additional flies from $HIREP to $SOMBRERO${NORMAL}"
     for FILE in $(cat $FILELIST)
     do
         NEWFILE=$(sed 's|'$HIREP'|'$SOMBRERO'|' <<< "$FILE")
@@ -180,7 +184,7 @@ copy_additional_files(){
 #11
 clean_macros(){
     local SOMBRERO=$1
-    echo "Cleaning macros in $SOMBRERO"
+    echo -e "${BOLD}Cleaning macros in $SOMBRERO${NORMAL}"
     $MACROMODULE/replace_macros.sh $SOMBRERO
 }
 
@@ -188,6 +192,6 @@ clean_macros(){
 package(){
     local SOMBRERO=$1
     local OUTPUT=sombrero.tar.gz
-    echo "Packaging all relevant files in $SOMBRERO into $OUTPUT"
+    echo -e "${BOLD}Packaging all relevant files in $SOMBRERO into $OUTPUT${NORMAL}"
     find $SOMBRERO -type f | grep -v '.git' | xargs tar -cvf sombrero.tar.gz
 }
