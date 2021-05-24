@@ -21,6 +21,35 @@ export PYTHONPATH=$FFMODULE:$MACROMODULE
 BOLD="\e[1;32m"
 NORMAL="\e[0m"
 
+get_commit_url() {
+    local REPO="$1"
+    local DIRNAME="$2"
+    if get_commit_id_for_directory ${DIRNAME} >/dev/null; then
+        echo ${REPO}/tree/$( get_commit_id_for_directory ${DIRNAME} )
+    else
+        echo ${REPO}
+    fi
+}
+get_commit_id_for_directory() {
+    local DIRNAME=$1
+    local GIT_CMD="git -C ${DIRNAME} rev-parse --short HEAD"
+    if ${GIT_CMD} >/dev/null 2>&1; then
+        local ID=$( ${GIT_CMD} )
+        if ! git -C ${DIRNAME} diff --exit-code >/dev/null; then
+            local ID="${ID} (UNCOMMITTED CHANGES)"
+            local RETVAL=1
+        else
+            local RETVAL=0
+        fi
+    else
+        local ID="UNKNOWN"
+        local RETVAL=2
+    fi
+    echo ${ID}
+    return ${RETVAL}
+}
+
+
 # 1
 clone_hirep(){
     local HIREP=$1
@@ -73,37 +102,6 @@ clone_sombrero(){
 }
 # 4
 set_version_information(){
-    local HIREP=$1
-    local SOMBRERO=$2
-    local SHOPLIFTER=$3
-
-    get_commit_id_for_directory() {
-        local DIRNAME=$1
-        local GIT_CMD="git -C ${DIRNAME} rev-parse --short HEAD"
-        if ${GIT_CMD} >/dev/null 2>&1; then
-            local ID=$( ${GIT_CMD} )
-            if ! git -C ${DIRNAME} diff --exit-code >/dev/null; then
-                local ID="${ID} (UNCOMMITTED CHANGES)"
-                local RETVAL=1
-            else
-                local RETVAL=0
-            fi
-        else
-            local ID="UNKNOWN"
-            local RETVAL=2
-        fi
-        echo ${ID}
-        return ${RETVAL}
-    }
-    get_commit_url() {
-        local REPO="$1"
-        local DIRNAME="$2"
-        if get_commit_id_for_directory ${DIRNAME} >/dev/null; then
-            echo ${REPO}/tree/$( get_commit_id_for_directory ${DIRNAME} )
-        else
-            echo ${REPO}
-        fi
-    }
     portable_sed_in_place() {
         local EXPR="$1"
         local FILE="$2"
@@ -111,12 +109,19 @@ set_version_information(){
         sed "${EXPR}" "${FILE}" > "${TMP_FILE}"
         mv "${TMP_FILE}" "${FILE}"
     }
-    local HIREP_COMMIT_ID="$(get_commit_id_for_directory ${HIREP})"
+
+    local HIREP="$1"
+    local SOMBRERO="$2"
+    local SHOPLIFTER="$3"
+
+    local HIREP_COMMIT_ID="$4"
+    local HIREP_URL="$5"
+
     local SOMBRERO_COMMIT_ID="$(get_commit_id_for_directory ${SOMBRERO})"
     local SHOPLIFTER_COMMIT_ID="$(get_commit_id_for_directory ${SHOPLIFTER})"
-    local HIREP_URL="$(get_commit_url https://github.com/sa2c/HiRep ${HIREP})"
     local SOMBRERO_URL="$(get_commit_url https://github.com/sa2c/SOMBRERO ${SOMBRERO})"
     local SHOPLIFTER_URL="$(get_commit_url https://github.com/mmesiti/shoplifter ${SHOPLIFTER})"
+
     for FILE in ${SOMBRERO}/README.md ${SOMBRERO}/sombrero/sombrero.c; do
         portable_sed_in_place "s|{{hirep_commit}}|${HIREP_COMMIT_ID}|" ${FILE}
         portable_sed_in_place "s|{{sombrero_commit}}|${SOMBRERO_COMMIT_ID}|" ${FILE}

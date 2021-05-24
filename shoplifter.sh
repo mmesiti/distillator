@@ -5,12 +5,14 @@ source $SCRIPT_LOCATION/lib.sh
 
 # 1
 clone_hirep $HIREP
+HIREP_COMMIT_ID="$(get_commit_id_for_directory ${HIREP})"
+HIREP_URL="$(get_commit_url https://github.com/sa2c/HiRep ${HIREP})"
 # 2
 generate_headers $HIREP
 # 3
 clone_sombrero $SOMBRERO
 # 4
-set_version_information $HIREP $SOMBRERO $SCRIPT_LOCATION
+set_version_information $HIREP $SOMBRERO $SCRIPT_LOCATION $HIREP_COMMIT_ID $HIREP_URL
 # 5
 copy_sombrero_files $HIREP $SOMBRERO
 # 6
