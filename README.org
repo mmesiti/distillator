@@ -27,7 +27,9 @@ some of these steps might fail.
 3. Clone as "thin" version of Sombrero
    (where "thin" means without most of LibHR,
    that will be stolen from HiRep);
-4. "Graft" Sombrero onto HiRep,
+4. Label the Sombrero README and benchmark output with the commit ID of the
+   Sombrero, HiRep, and shoplifter versions used to generate it.
+5. "Graft" Sombrero onto HiRep,
    i.e., copy some files from Sombrero into HiRep
    - sombrero/sombrero directory
    - Include/suN.h
@@ -36,14 +38,14 @@ some of these steps might fail.
    - Include/libhr_defines_interface.h
    - Include/suN_types.h
    This is done to build ASTs and callgraphs starting from Sombrero's ~main()~ function;
-5. Clone pycparser (to use [[https://github.com/eliben/pycparser/tree/master/utils/fake_libc_include][fake_libc_include]] as recommended);
-6. Analyse callgraph with sombrero and LibHR, find the useful source files;
-7. Copy and clean the useful sources to the "thin Sombrero" repository, filtering out the unused functions;
-8. Copy the makefiles to the "thin Sombrero" repository (not overwriting the ones that are already there); 
-9. Copy and clean the useful headers to the "thin Sombrero" repository;
-10. Copy to the "thin Sombrero" repository other manually listed files that for some reason were not detected;
-11. Clean the macros in the "thin Sombrero" repository (which is not that thin anymore), in place.
-12. Package sombrero in a ~tar.gz~ file.
+6. Clone pycparser (to use [[https://github.com/eliben/pycparser/tree/master/utils/fake_libc_include][fake_libc_include]] as recommended);
+7. Analyse callgraph with sombrero and LibHR, find the useful source files;
+8. Copy and clean the useful sources to the "thin Sombrero" repository, filtering out the unused functions;
+9. Copy the makefiles to the "thin Sombrero" repository (not overwriting the ones that are already there);
+10. Copy and clean the useful headers to the "thin Sombrero" repository;
+11. Copy to the "thin Sombrero" repository other manually listed files that for some reason were not detected;
+12. Clean the macros in the "thin Sombrero" repository (which is not that thin anymore), in place.
+13. Package sombrero in a ~tar.gz~ file.
 
 Note: all the steps are defined in [[file:lib.sh][lib.sh]].
 

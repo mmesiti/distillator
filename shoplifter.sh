@@ -5,27 +5,31 @@ source $SCRIPT_LOCATION/lib.sh
 
 # 1
 clone_hirep $HIREP
+HIREP_COMMIT_ID="$(get_commit_id_for_directory ${HIREP})"
+HIREP_URL="$(get_commit_url https://github.com/sa2c/HiRep ${HIREP})"
 # 2
 generate_headers $HIREP
 # 3
 clone_sombrero $SOMBRERO
 # 4
-copy_sombrero_files $HIREP $SOMBRERO  
+set_version_information $HIREP $SOMBRERO $SCRIPT_LOCATION $HIREP_COMMIT_ID $HIREP_URL
 # 5
-clone_pycparser $PYCPARSER
+copy_sombrero_files $HIREP $SOMBRERO
 # 6
+clone_pycparser $PYCPARSER
+# 7
 analyse_callgraph $HIREP $PYCPARSER
-# 7 
-copy_and_clean_selected_sources $HIREP $SOMBRERO  
 # 8
-copy_makefiles $HIREP $SOMBRERO  
+copy_and_clean_selected_sources $HIREP $SOMBRERO
 # 9
+copy_makefiles $HIREP $SOMBRERO
+# 10
 copy_selected_headers used_headers.txt $SOMBRERO  all_unused_functions.txt
-#10 
+# 11
 copy_additional_files $SCRIPT_LOCATION/additional_files_to_copy.txt $HIREP $SOMBRERO
-#11
+# 12
 clean_macros $SOMBRERO
-#12
+# 13
 package $SOMBRERO
 
 echo "Finished."

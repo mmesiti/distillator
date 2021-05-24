@@ -21,6 +21,35 @@ export PYTHONPATH=$FFMODULE:$MACROMODULE
 BOLD="\e[1;32m"
 NORMAL="\e[0m"
 
+get_commit_url() {
+    local REPO="$1"
+    local DIRNAME="$2"
+    if get_commit_id_for_directory ${DIRNAME} >/dev/null; then
+        echo ${REPO}/tree/$( get_commit_id_for_directory ${DIRNAME} )
+    else
+        echo ${REPO}
+    fi
+}
+get_commit_id_for_directory() {
+    local DIRNAME=$1
+    local GIT_CMD="git -C ${DIRNAME} rev-parse --short HEAD"
+    if ${GIT_CMD} >/dev/null 2>&1; then
+        local ID=$( ${GIT_CMD} )
+        if ! git -C ${DIRNAME} diff --exit-code >/dev/null; then
+            local ID="${ID} (UNCOMMITTED CHANGES)"
+            local RETVAL=1
+        else
+            local RETVAL=0
+        fi
+    else
+        local ID="UNKNOWN"
+        local RETVAL=2
+    fi
+    echo ${ID}
+    return ${RETVAL}
+}
+
+
 # 1
 clone_hirep(){
     local HIREP=$1
@@ -72,6 +101,37 @@ clone_sombrero(){
     git clone --depth=1 ${SOMBRERO_REMOTE} --branch ${SOMBRERO_REMOTE_BRANCH} ${SOMBRERO}
 }
 # 4
+set_version_information(){
+    portable_sed_in_place() {
+        local EXPR="$1"
+        local FILE="$2"
+        local TMP_FILE="$( mktemp XXXXXXXX )"
+        sed "${EXPR}" "${FILE}" > "${TMP_FILE}"
+        mv "${TMP_FILE}" "${FILE}"
+    }
+
+    local HIREP="$1"
+    local SOMBRERO="$2"
+    local SHOPLIFTER="$3"
+
+    local HIREP_COMMIT_ID="$4"
+    local HIREP_URL="$5"
+
+    local SOMBRERO_COMMIT_ID="$(get_commit_id_for_directory ${SOMBRERO})"
+    local SHOPLIFTER_COMMIT_ID="$(get_commit_id_for_directory ${SHOPLIFTER})"
+    local SOMBRERO_URL="$(get_commit_url https://github.com/sa2c/SOMBRERO ${SOMBRERO})"
+    local SHOPLIFTER_URL="$(get_commit_url https://github.com/mmesiti/shoplifter ${SHOPLIFTER})"
+
+    for FILE in ${SOMBRERO}/README.md ${SOMBRERO}/sombrero/sombrero.c; do
+        portable_sed_in_place "s|{{hirep_commit}}|${HIREP_COMMIT_ID}|" ${FILE}
+        portable_sed_in_place "s|{{sombrero_commit}}|${SOMBRERO_COMMIT_ID}|" ${FILE}
+        portable_sed_in_place "s|{{shoplifter_commit}}|${SHOPLIFTER_COMMIT_ID}|" ${FILE}
+        portable_sed_in_place "s|{{hirep_url}}|${HIREP_URL}|" ${FILE}
+        portable_sed_in_place "s|{{sombrero_url}}|${SOMBRERO_URL}|" ${FILE}
+        portable_sed_in_place "s|{{shoplifter_url}}|${SHOPLIFTER_URL}|" ${FILE}
+    done
+}
+# 5
 copy_sombrero_files(){
     local HIREP=$1
     local SOMBRERO=$2
@@ -100,20 +160,20 @@ copy_sombrero_files(){
     done 
 
 }
-# 5
+# 6
 clone_pycparser(){
     local PYCPARSER=$1
     echo -e "${BOLD}Cloning $PYCPARSER${NORMAL}"
     git clone --depth=1 ${PYCPARSER_REMOTE} $PYCPARSER
 }
-# 6
+# 7
 analyse_callgraph(){
     local HIREP=$1
     local PYCPARSER=$2
     echo -e "${BOLD}Analysing Callgraph in $HIREP${NORMAL}"
     python3 $FFMODULE/main.py $FFMODULE/cpp_flags.yaml $HIREP $PYCPARSER
 }
-# 7 
+# 8
 copy_and_clean_selected_sources(){
     # TODO: maybe use a flat directory instead?    
     local HIREP=$1
@@ -127,7 +187,7 @@ copy_and_clean_selected_sources(){
     done
 
 }
-# 8
+# 9
 copy_makefiles(){
     # Since we're not using a flat directory,
     # we need to also copy the makefiles
@@ -152,7 +212,7 @@ copy_makefiles(){
         fi
     done
 }
-# 9
+# 10
 copy_selected_headers(){
     local FILELIST=$1
     local SOMBRERO=$2
@@ -165,7 +225,7 @@ copy_selected_headers(){
         python3 $FFMODULE/filter_header.py $FILE $NEWFILE $UNUSED_FUNCTIONS
     done 
 }
-#10 
+# 11
 copy_additional_files(){
     local FILELIST=$1
     local HIREP=$2
@@ -181,14 +241,14 @@ copy_additional_files(){
         )
     done
 }
-#11
+# 12
 clean_macros(){
     local SOMBRERO=$1
     echo -e "${BOLD}Cleaning macros in $SOMBRERO${NORMAL}"
     $MACROMODULE/replace_macros.sh $SOMBRERO
 }
 
-#12
+# 13
 package(){
     local SOMBRERO=$1
     local OUTPUT=sombrero.tar.gz
