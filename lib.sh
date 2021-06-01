@@ -120,7 +120,7 @@ set_version_information(){
     local SOMBRERO_COMMIT_ID="$(get_commit_id_for_directory ${SOMBRERO})"
     local SHOPLIFTER_COMMIT_ID="$(get_commit_id_for_directory ${SHOPLIFTER})"
     local SOMBRERO_URL="$(get_commit_url https://github.com/sa2c/SOMBRERO ${SOMBRERO})"
-    local SHOPLIFTER_URL="$(get_commit_url https://github.com/mmesiti/shoplifter ${SHOPLIFTER})"
+    local SHOPLIFTER_URL="$(get_commit_url https://github.com/sa2c/shoplifter ${SHOPLIFTER})"
 
     for FILE in ${SOMBRERO}/README.md ${SOMBRERO}/sombrero/sombrero.c; do
         portable_sed_in_place "s|{{hirep_commit}}|${HIREP_COMMIT_ID}|" ${FILE}
