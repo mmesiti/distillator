@@ -122,8 +122,7 @@ if __name__ == "__main__":
     sombrero_root = argv[2]
     pycparser_root = argv[3]
 
-    #groupreps = cfl.get_groupreps(cpp_flags_file)
-    groupreps = ["su3sym"]
+    groupreps = cfl.get_groupreps(cpp_flags_file)
 
     (used_files_sets, function_sets_gr,
      all_file_used_function_dict) = get_function_sets_gr(
