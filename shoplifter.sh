@@ -24,7 +24,7 @@ copy_and_clean_selected_sources $HIREP $SOMBRERO
 # 9
 copy_makefiles $HIREP $SOMBRERO
 # 10
-copy_selected_headers used_headers.txt $SOMBRERO  all_unused_functions.txt
+copy_selected_headers used_headers.txt $SOMBRERO  all_unused_function_names.txt
 # 11
 copy_additional_files $SCRIPT_LOCATION/additional_files_to_copy.txt $HIREP $SOMBRERO
 # 12

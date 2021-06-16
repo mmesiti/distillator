@@ -4,7 +4,7 @@ from sys import argv
 import cflags_loader as cfl
 import headers
 from include import sombrero_include
-
+import os
 
 def is_filename_relevant(filename):
     res = ("sombrero/sombrero.c" in filename
@@ -19,21 +19,21 @@ def is_filename_relevant(filename):
 
 def get_functions(grouprep, sombrero_root, pycparser_root, cpp_flags_file):
 
-    call_graph, file_function_dict = cg.get_callgraph(grouprep, sombrero_root,
-                                                      pycparser_root,
-                                                      is_filename_relevant,
-                                                      cpp_flags_file)
+    call_graph_info = cg.get_callgraph(grouprep, sombrero_root,
+                                                 pycparser_root,
+                                                 is_filename_relevant,
+                                                 cpp_flags_file)
 
-    all_defined = cg.get_all_defined_functions(call_graph)
-    used, undefined = cg.get_all_used_functions(call_graph)
+    all_defined = cg.get_all_defined_functions(call_graph_info)
+    root_info = ('main',os.path.join(sombrero_root,'sombrero/sombrero.c'))
+    used, undefined = cg.get_all_used_functions(call_graph_info,root_info)
+
+    #file_function_pair_list = [ (name, filename) for name, filename, storage, callees ]
 
     unused = all_defined.difference(used)
-    return (
-        dict(used_functions=used,
+    return dict(used_functions=used,
              unused_functions=unused,
-             undefined_functions=undefined),
-        file_function_dict,
-    )
+             undefined_functions=undefined)
 
 
 def write_function_lists(file_prefix, used_functions, unused_functions,
@@ -80,18 +80,16 @@ def get_function_sets_gr(groupreps, sombrero_root, pycparser_root,
                          cpp_flags_file):
     used_files_sets = []
     function_sets_gr = dict()
-    all_file_used_function_dict = dict()
+    all_file_used_function_list = []
     for grouprep in groupreps:
         print(f"Processing {grouprep} case")
-
-        function_sets, file_function_dict = get_functions(
+        function_sets = get_functions(
             grouprep, sombrero_root, pycparser_root, cpp_flags_file)
         function_sets_gr[("used", grouprep)] = function_sets["used_functions"]
 
         for f in function_sets["used_functions"]:
             if f not in function_sets["undefined_functions"]:
-                all_file_used_function_dict[(grouprep,
-                                             f)] = file_function_dict[f]
+                all_file_used_function_list.append((grouprep, *f.split(':')))
 
         function_sets_gr[("all",
                           grouprep)] = set.union(*function_sets.values())
@@ -102,21 +100,29 @@ def get_function_sets_gr(groupreps, sombrero_root, pycparser_root,
         function_sets_gr[("unused",
                           grouprep)] = function_sets["unused_functions"]
 
-        used_files = set(file_function_dict[f]
+        used_files = set(f.split(':')[0]
                          for f in function_sets["used_functions"]
                          if f not in function_sets["undefined_functions"])
         used_files_sets.append(used_files)
 
-    return used_files_sets, function_sets_gr, all_file_used_function_dict
+    return used_files_sets, function_sets_gr, all_file_used_function_list
 
 
-def write_gr_function_file_dict(gr_function_file_dict, tag):
+def write_gr_function_file_dict(gr_function_file_list, tag):
     fname = f"{tag}_gr_function_file_table.txt"
     with open(fname, 'w') as outfile:
-        for (gr, fun), filename in gr_function_file_dict.items():
+        for gr, filename, fun in gr_function_file_list:
             outfile.write(f"{gr} {fun} {filename}\n")
 
 
+def write_unused_function_names(unused_function_names):
+    fname = "all_unused_function_names.txt"
+    print(f"Writing {fname}...")
+    with open(fname, 'w') as outfile:
+        for fun in unused_function_names: 
+            outfile.write(f"{fun}\n")
+
+            
 if __name__ == "__main__":
     cpp_flags_file = argv[1]
     sombrero_root = argv[2]
@@ -125,10 +131,10 @@ if __name__ == "__main__":
     groupreps = cfl.get_groupreps(cpp_flags_file)
 
     (used_files_sets, function_sets_gr,
-     all_file_used_function_dict) = get_function_sets_gr(
+     all_file_used_function_list) = get_function_sets_gr(
          groupreps, sombrero_root, pycparser_root, cpp_flags_file)
 
-    write_gr_function_file_dict(all_file_used_function_dict, "all")
+    write_gr_function_file_dict(all_file_used_function_list, "all")
 
     write_function_lists_for_all_groupreps(groupreps, function_sets_gr)
 
@@ -147,6 +153,7 @@ if __name__ == "__main__":
         undefined_functions=undefined_function_set,
     )
 
+
     write_function_lists("all", **functions_sets)
 
     used_files = set.union(*used_files_sets)
@@ -157,3 +164,19 @@ if __name__ == "__main__":
         used_files, [sombrero_include(sombrero_root)])
 
     write_used_header_list(used_headers)
+
+
+    # We need this to filter the header files
+    # the functions for cleaning header files
+    # cannot distinguish between different functions with the same name
+    # and thus need only the names.
+    # We are conservative here and if a functions with a given name is found
+    # then we don't delete any functions with that name.
+    def get_names(func_set):
+        return set( func.split(':')[1] for func in func_set)
+    used_function_names = get_names(used_functions_set)
+    all_function_names = get_names(all_functions_set)
+    unused_function_names = all_function_names.difference(used_function_names)
+
+    write_unused_function_names(unused_function_names)
+   

@@ -171,6 +171,7 @@ analyse_callgraph(){
     local HIREP=$1
     local PYCPARSER=$2
     echo -e "${BOLD}Analysing Callgraph in $HIREP${NORMAL}"
+    echo -e "${BOLD}THIS WILL TAKE A WHILE...${NORMAL}"
     python3 $FFMODULE/main.py $FFMODULE/cpp_flags.yaml $HIREP $PYCPARSER
 }
 # 8
@@ -217,7 +218,7 @@ copy_selected_headers(){
     local FILELIST=$1
     local SOMBRERO=$2
     local UNUSED_FUNCTIONS=$3
-    echo -e "${BOLD}Copying necessary Makefiles from $HIREP to $SOMBRERO${NORMAL}"
+    echo -e "${BOLD}Copying selected headers from $HIREP to $SOMBRERO${NORMAL}"
     for FILE in $(cat $FILELIST)
     do
         echo -e $FILE

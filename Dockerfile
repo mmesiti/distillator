@@ -6,6 +6,7 @@ RUN useradd -m sombrero
 RUN mkdir /output && chown sombrero /output
 COPY bootstrap.sh /home/sombrero
 RUN chown sombrero /home/sombrero/bootstrap.sh
+RUN pacman -S bc --noconfirm
 USER sombrero
 RUN chmod +x /home/sombrero/bootstrap.sh
 WORKDIR /home/sombrero

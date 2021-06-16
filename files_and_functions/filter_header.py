@@ -8,14 +8,12 @@ if __name__ == "__main__":
     output = argv[2]
     unused_function_file = argv[3]
 
-    unused_functions = open(unused_function_file).read().strip().split()
-
-    unused_functions.remove('main')
+    unused_function_names = open(unused_function_file).read().strip().split()
 
     with open(_input ,'r') as f:
         lines = f.readlines()
 
-    lines = clean_lines(unused_functions, lines)
+    lines = clean_lines(unused_function_names, lines)
 
     with open(output,'w') as out:
         out.write(''.join(lines))

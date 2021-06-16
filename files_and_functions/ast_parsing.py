@@ -35,12 +35,18 @@ def ast_rec_iterator(node, tag="", level=0):
 
 
 def find_function_definitions(ast):
-
-    return dict(
-        (node.decl.name, node)
+    # Function definitions should be unique.
+    decl_list = [(node.decl.name, node.decl.storage, node)
         for _, node in ast_rec_iterator(ast)
-        if isinstance(node, c_ast.FuncDef)
-    )
+        if isinstance(node, c_ast.FuncDef)]
+
+    names =  [ name for name,storage,node in decl_list ]
+    for name in set(names):
+        count = names.count(name)
+        assert count == 1, f"Function {name} is declared {count} times!"
+    return decl_list
+
+
 
 
 def find_function_call_names(ast):
