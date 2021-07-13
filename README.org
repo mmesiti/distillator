@@ -63,8 +63,28 @@ This is done by [[file:test.sh][test.sh]].
 2. run all the 6 benchmarks.
 
 
-* Packaging
-1. TODO:package everything and publish it somewhere accessible
+* Packaging and Spack
+Once a packaged ~sombrero.tar.gz~
+has been produced in any way
+(by ~shoplifter.sh~,
+or by running the Docker image),
+it can be published to github,
+on the ~shoplifted~ branch.
+The approach followed so far is:
+1. clone the ~sombrero~ repository
+2. check out the ~shoplifted~ branch
+3. copy the content of ~sombrero.tar.gz~
+   into the ~sombrero~ repository
+4. add all the relevant files,
+   commit and push to github.
+5. Create a new release.
+   The versions are named
+   with a date in the format ~yyyy-mm-dd~,
+   e.g., ~2021-07-05~.
+6. Add the new version
+   in the Sombrero's ~package.py~
+   on the Spack package index.
+
 
 * Internals
 The parser needs to work on the preprocessed code,

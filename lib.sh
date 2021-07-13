@@ -61,8 +61,16 @@ generate_headers(){
     local HIREP=$1
     echo -e "${BOLD}Preparing MkFlags${NORMAL}"
     local MKFLAGS=${HIREP}/Make/MkFlags
-    echo -e "${BOLD}Back up of MkFlags${NORMAL}"
-    cp $MKFLAGS $MKFLAGS.bu 
+    if [ -f $MKFLAGS ]
+    then
+        echo -e "${BOLD}Back up of MkFlags${NORMAL}"
+        cp $MKFLAGS $MKFLAGS.bu 
+    fi
+    if [ ! -f $MKFLAGS.bu ]
+    then
+        echo "Missing $MKFLAGS.bu, terminating..."
+        exit 1
+    fi
     grep -v "NG\|REPR\|GAUGE_GROUP" $MKFLAGS.bu > $MKFLAGS 
 
     write_headers(){

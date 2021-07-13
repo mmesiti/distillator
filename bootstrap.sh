@@ -9,6 +9,8 @@ mkdir build
     ../shoplifter/shoplifter.sh
     (
     cd sombrero
+    export MPICC=mpicc
+    export CFLAGS="-O2"
     make
     ./sombrero.sh -n 2 -p 2x1x1x1 -l 8x8x8x8
     )
